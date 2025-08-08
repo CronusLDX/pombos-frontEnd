@@ -1,11 +1,37 @@
-import React from 'react';
-import { Main } from './styled';
+import React, { useEffect, useState } from 'react';
+import { Main, StyledLink } from './styled';
+import { useParams } from 'react-router';
+import { useMail } from '../../../contexts/MailContext';
+import type { MailProps } from '../../../utilities/Interfaces';
 
 const UpdateMail: React.FC = () => {
+  const { id } = useParams();
+  const { mail, updateMail } = useMail();
+
+  const foundMail = mail.find(mail => mail.id === id);
+  const [item, setItem] = useState<MailProps | undefined>(foundMail);
+
+  if (!item) {
+    return (
+      <Main>
+        <h1>Carta não encontrada</h1>
+        <StyledLink to="/cartas">Voltar para lista</StyledLink>
+      </Main>
+    );
+  }
+
+  useEffect(() => {
+    setItem(foundMail);
+  }, [foundMail]);
   return (
     <>
       <Main>
-        <form>
+        <form
+          onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            if (item) updateMail(item);
+          }}
+        >
           <section>
             <div>
               <label htmlFor="title">&nbsp;Título:</label>
@@ -15,6 +41,10 @@ const UpdateMail: React.FC = () => {
                 name="title"
                 placeholder="Carta À senhor Gertrudes"
                 required
+                value={item.title}
+                onChange={event =>
+                  setItem({ ...item, title: event.target.value })
+                }
               />
             </div>
             <div>
@@ -25,6 +55,10 @@ const UpdateMail: React.FC = () => {
                 name="address"
                 placeholder="Ex: Rua dos Bobos Número 0"
                 required
+                value={item.address}
+                onChange={event =>
+                  setItem({ ...item, address: event.target.value })
+                }
               />
             </div>
           </section>
@@ -37,6 +71,10 @@ const UpdateMail: React.FC = () => {
                 name="destination"
                 placeholder="Ex: Sr.Smith"
                 required
+                value={item.destination}
+                onChange={event =>
+                  setItem({ ...item, destination: event.target.value })
+                }
               />
             </div>
             <div>
@@ -47,6 +85,10 @@ const UpdateMail: React.FC = () => {
                 name="remitter"
                 placeholder="Ex: Sr.Jones"
                 required
+                value={item.remitter}
+                onChange={event =>
+                  setItem({ ...item, remitter: event.target.value })
+                }
               />
             </div>
           </section>
@@ -59,6 +101,10 @@ const UpdateMail: React.FC = () => {
                 name="mailPidgey"
                 placeholder="Ex: Gatilho"
                 required
+                value={item.pidgey}
+                onChange={event =>
+                  setItem({ ...item, pidgey: event.target.value })
+                }
               />
             </div>
             <div>
@@ -69,6 +115,10 @@ const UpdateMail: React.FC = () => {
                 name="status"
                 placeholder="Ex: Na fila"
                 required
+                value={item.status}
+                onChange={event =>
+                  setItem({ ...item, status: event.target.value })
+                }
               />
             </div>
           </section>
@@ -79,6 +129,10 @@ const UpdateMail: React.FC = () => {
               name="content"
               placeholder="Ex: Conteúdo da carta"
               required
+              value={item.content}
+              onChange={event =>
+                setItem({ ...item, content: event.target.value })
+              }
             ></textarea>
           </div>
           <button id="save" type="submit">
@@ -87,10 +141,9 @@ const UpdateMail: React.FC = () => {
         </form>
       </Main>
       <footer className="flex justify-center text-center items-center">
-        Criado em: &nbsp; <span>{new Date().toLocaleString()}</span> &nbsp; |
-        &nbsp; ID: <span>&nbsp;{Math.floor(Math.random() * 100000000)}</span>{' '}
-        &nbsp; | &nbsp; Atualizado em:{' '}
-        <span>&nbsp;{new Date().toLocaleString()}</span>
+        Criado em: &nbsp; <span>{item.createdAt}</span> &nbsp; | &nbsp; ID:{' '}
+        <span>&nbsp;{item.id}</span> &nbsp; | &nbsp; Atualizado em:{' '}
+        <span>&nbsp;{item.updatedAt}</span>
       </footer>
     </>
   );

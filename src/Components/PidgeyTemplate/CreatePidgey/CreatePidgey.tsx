@@ -1,11 +1,13 @@
 import React from 'react';
 import { Main } from './styled';
+import { usePidgey } from '../../../contexts/PidgeyContext';
 
 const CreatePidgey: React.FC = () => {
+  const { handleSubmit } = usePidgey();
   return (
     <>
       <Main>
-        <form>
+        <form onSubmit={handleSubmit}>
           <section>
             <div>
               <label htmlFor="picture">&nbsp;Foto:</label>

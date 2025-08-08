@@ -1,10 +1,19 @@
 import { RouterProvider } from 'react-router-dom';
 import router from './Routes';
+import { ClientProvider } from './contexts/ClientContext';
+import { PidgeyProvider } from './contexts/PidgeyContext';
+import { MailProvider } from './contexts/MailContext';
 
 const App = () => {
   return (
     <>
-      <RouterProvider router={router}></RouterProvider>
+      <PidgeyProvider>
+        <ClientProvider>
+          <MailProvider>
+            <RouterProvider router={router}></RouterProvider>
+          </MailProvider>
+        </ClientProvider>
+      </PidgeyProvider>
     </>
   );
 };

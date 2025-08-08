@@ -1,7 +1,22 @@
 import React from 'react';
 import { Main, StyledLink } from './styled';
+import { usePidgey } from '../../../contexts/PidgeyContext';
+import { useParams } from 'react-router-dom';
 
 const ShowPidgey: React.FC = () => {
+  const { id } = useParams();
+  const { pidgey } = usePidgey();
+
+  const foundData = pidgey.find(pidgey => String(pidgey.id) === String(id));
+
+  if (!foundData) {
+    return (
+      <Main>
+        <h1>Pombo não encontrado</h1>
+        <StyledLink to="/pombos">Voltar para lista</StyledLink>
+      </Main>
+    );
+  }
   return (
     <>
       <Main>
@@ -14,6 +29,7 @@ const ShowPidgey: React.FC = () => {
                 id="picture"
                 name="picture"
                 placeholder="URL da imagem"
+                value={foundData.picture}
                 disabled
               />
             </div>
@@ -24,6 +40,7 @@ const ShowPidgey: React.FC = () => {
                 id="nickname"
                 name="nickname"
                 placeholder="Ex: Gatilho"
+                value={foundData.nickname}
                 disabled
               />
             </div>
@@ -35,6 +52,7 @@ const ShowPidgey: React.FC = () => {
                 type="number"
                 id="averageSpeed"
                 name="averageSpeed"
+                value={foundData.averageSpeed}
                 placeholder="Ex: 50"
                 disabled
               />
@@ -46,6 +64,7 @@ const ShowPidgey: React.FC = () => {
                 id="status"
                 name="status"
                 placeholder="Ex: Ativo ou Aposentado"
+                value={foundData.status}
                 disabled
               />
             </div>
@@ -53,7 +72,13 @@ const ShowPidgey: React.FC = () => {
           <section>
             <div>
               <label htmlFor="dateOfBirth">&nbsp;Data de Nascimento:</label>
-              <input type="date" id="dateOfBirth" name="dateOfBirth" disabled />
+              <input
+                type="date"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                disabled
+                value={foundData.dateOfBirth}
+              />
             </div>
 
             <div>
@@ -62,6 +87,7 @@ const ShowPidgey: React.FC = () => {
                 type="number"
                 id="letterDelivered"
                 name="letterDelivered"
+                value={foundData.letterDelivered}
                 disabled
               />
             </div>
@@ -72,6 +98,7 @@ const ShowPidgey: React.FC = () => {
               id="description"
               name="description"
               placeholder="Ex: Descrição"
+              value={foundData.description}
               disabled
             ></textarea>
           </div>
@@ -81,10 +108,9 @@ const ShowPidgey: React.FC = () => {
         </form>
       </Main>
       <footer className="flex justify-center text-center items-center">
-        Criado em: &nbsp; <span>{new Date().toLocaleString()}</span> &nbsp; |
-        &nbsp; ID: <span>&nbsp;{Math.floor(Math.random() * 100000000)}</span>{' '}
-        &nbsp; | &nbsp; Atualizado em:{' '}
-        <span>&nbsp;{new Date().toLocaleString()}</span>
+        Criado em: &nbsp; <span>{foundData.createdAt}</span> &nbsp; | &nbsp; ID:{' '}
+        <span>&nbsp;{foundData.id}</span> &nbsp; | &nbsp; Atualizado em:{' '}
+        <span>&nbsp;{foundData.updatedAt}</span>
       </footer>
     </>
   );

@@ -1,11 +1,13 @@
 import React from 'react';
 import { Main } from './styled';
+import { useMail } from '../../../contexts/MailContext';
 
 const CreateMail: React.FC = () => {
+  const { handleSubmit } = useMail();
   return (
     <>
       <Main>
-        <form>
+        <form onSubmit={handleSubmit}>
           <section>
             <div>
               <label htmlFor="title">&nbsp;Título:</label>

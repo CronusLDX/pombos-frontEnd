@@ -1,7 +1,9 @@
 import React from 'react';
 import { Main, StyledLinkAtualizar, StyledLnkVer } from './styled';
+import { useMail } from '../../../contexts/MailContext';
 
 const ListMail: React.FC = () => {
+  const { mail, deleteMail } = useMail();
   return (
     <>
       <Main>
@@ -17,41 +19,37 @@ const ListMail: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="text-center text-lg font-normal">
-                Carta à senhora Gertrudes
-              </td>
-              <td className="text-center text-lg font-normal">João Claúdio</td>
-              <td className="text-center text-lg font-normal">Gertrudes</td>
-              <td className="text-center text-lg font-normal">Gatilho</td>
-              <td className="text-center text-lg font-normal">Na fila</td>
-              <td>
-                <StyledLnkVer
-                  to={`/cartas/verificar`}
-                  className="transition-all ease-in-out duration-300"
-                >
-                  Ver
-                </StyledLnkVer>
-                <StyledLinkAtualizar
-                  to={`/cartas/atualizar`}
-                  className="transition-all ease-in-out duration-300"
-                >
-                  Atualizar
-                </StyledLinkAtualizar>
-                <button
-                  id="changeStatus-button"
-                  className="transition-all ease-in-out duration-300 bg-amber-500 hover:bg-amber-600"
-                >
-                  Mudar Status
-                </button>
-                <button
-                  id="delete-button"
-                  className="transition-all ease-in-out duration-300 bg-[#dc143c] hover:bg-red-600"
-                >
-                  Remover
-                </button>
-              </td>
-            </tr>
+            {mail.map(mail => (
+              <tr key={mail.id}>
+                <td className="text-center  font-normal">{mail.title}</td>
+                <td className="text-center  font-normal">{mail.remitter}</td>
+                <td className="text-center  font-normal">{mail.destination}</td>
+                <td className="text-center  font-normal">{mail.pidgey}</td>
+                <td className="text-center  font-normal">{mail.status}</td>
+                <td>
+                  <StyledLnkVer
+                    to={`/cartas/verificar/${mail.id}`}
+                    className="transition-all ease-in-out duration-300"
+                  >
+                    Ver
+                  </StyledLnkVer>
+                  <StyledLinkAtualizar
+                    to={`/cartas/atualizar/${mail.id}`}
+                    className="transition-all ease-in-out duration-300"
+                  >
+                    Atualizar
+                  </StyledLinkAtualizar>
+
+                  <button
+                    id="delete-button"
+                    className="transition-all ease-in-out duration-300 bg-[#dc143c] hover:bg-red-600"
+                    onClick={() => (mail.id ? deleteMail(mail.id) : '')}
+                  >
+                    Remover
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </Main>

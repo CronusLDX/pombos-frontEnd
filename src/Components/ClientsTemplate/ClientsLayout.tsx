@@ -5,7 +5,7 @@ const ClientsLayout: React.FC = () => {
   const { pathname } = useLocation();
   return (
     <>
-      <main className="flex flex-col px-5  ">
+      <main className="flex flex-col px-3  ">
         <h1 className="px-4">Dados dos Clientes</h1>
         <div className="tabs ">
           <Link

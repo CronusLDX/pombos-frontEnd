@@ -1,8 +1,9 @@
 import React from 'react';
 import { Main, StyledLinkAtualizar, StyledLnkVer } from './styled';
-import logo from '../../../assets/logo.svg';
+import { usePidgey } from '../../../contexts/PidgeyContext';
 
 const ListPidgey: React.FC = () => {
+  const { pidgey, deletePidgey } = usePidgey();
   return (
     <Main>
       <table className="w-full">
@@ -16,40 +17,39 @@ const ListPidgey: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="text-center text-lg font-normal items-center justify-center flex">
-              <img src={logo} alt="imagem" className=" h-16" />
-            </td>
-            <td className="text-center text-lg font-normal">Gatilho</td>
-            <td className="text-center text-lg font-normal">12</td>
-            <td className="text-center text-lg font-normal">Ativo</td>
-            <td className="text-center">
-              <StyledLnkVer
-                to={`/pombos/verificar`}
-                className="transition-all ease-in-out duration-300"
-              >
-                Ver
-              </StyledLnkVer>
-              <StyledLinkAtualizar
-                to={`/pombos/atualizar`}
-                className="transition-all ease-in-out duration-300"
-              >
-                Atualizar
-              </StyledLinkAtualizar>
-              <button
-                id="changeStatus-button"
-                className="transition-all ease-in-out duration-300 bg-amber-500 hover:bg-amber-600"
-              >
-                Mudar Status
-              </button>
-              <button
-                id="delete-button"
-                className="transition-all ease-in-out duration-300 bg-[#dc143c] hover:bg-red-600"
-              >
-                Remover
-              </button>
-            </td>
-          </tr>
+          {pidgey.map(pidgey => (
+            <tr key={pidgey.id}>
+              <td className="text-center  font-normal items-center justify-center flex">
+                <img src={pidgey.picture} alt="imagem" className=" h-12" />
+              </td>
+              <td className="text-center  font-normal">{pidgey.nickname}</td>
+              <td className="text-center  font-normal">
+                {pidgey.letterDelivered}
+              </td>
+              <td className="text-center  font-normal">{pidgey.status}</td>
+              <td className="text-center">
+                <StyledLnkVer
+                  to={`/pombos/verificar/${pidgey.id}`}
+                  className="transition-all ease-in-out duration-300"
+                >
+                  Ver
+                </StyledLnkVer>
+                <StyledLinkAtualizar
+                  to={`/pombos/atualizar/${pidgey.id}`}
+                  className="transition-all ease-in-out duration-300"
+                >
+                  Atualizar
+                </StyledLinkAtualizar>
+                <button
+                  id="delete-button"
+                  className="transition-all ease-in-out duration-300 bg-[#dc143c] hover:bg-red-600"
+                  onClick={() => (pidgey.id ? deletePidgey(pidgey.id) : '')}
+                >
+                  Remover
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </Main>

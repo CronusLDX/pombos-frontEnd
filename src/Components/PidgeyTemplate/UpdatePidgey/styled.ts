@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Main = styled.main`
@@ -52,4 +53,14 @@ export const Main = styled.main`
     border-radius: 5px;
     cursor: pointer;
   }
+`;
+export const StyledLink = styled(Link)`
+  text-decoration: none;
+  padding: 10px 15px 10px 15px;
+  margin: 5px 5px 5px 5px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  color: white;
+  border: none;
+  cursor: pointer;
 `;

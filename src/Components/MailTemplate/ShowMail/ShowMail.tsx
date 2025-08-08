@@ -1,7 +1,22 @@
 import React from 'react';
 import { Main, StyledLink } from './styled';
+import { useMail } from '../../../contexts/MailContext';
+import { useParams } from 'react-router-dom';
 
 const ShowMail: React.FC = () => {
+  const { id } = useParams();
+  const { mail } = useMail();
+
+  const foundData = mail.find(mail => String(mail.id) === String(id));
+
+  if (!foundData) {
+    return (
+      <Main>
+        <h1>Carta não encontrada</h1>
+        <StyledLink to="/cartas">Voltar para lista</StyledLink>
+      </Main>
+    );
+  }
   return (
     <>
       <Main>
@@ -15,6 +30,7 @@ const ShowMail: React.FC = () => {
                 name="title"
                 placeholder="Carta À senhor Gertrudes"
                 disabled
+                value={foundData.title}
               />
             </div>
             <div>
@@ -25,6 +41,7 @@ const ShowMail: React.FC = () => {
                 name="address"
                 placeholder="Ex: Rua dos Bobos Número 0"
                 disabled
+                value={foundData.address}
               />
             </div>
           </section>
@@ -37,6 +54,7 @@ const ShowMail: React.FC = () => {
                 name="destination"
                 placeholder="Ex: Sr.Smith"
                 disabled
+                value={foundData.destination}
               />
             </div>
             <div>
@@ -47,6 +65,7 @@ const ShowMail: React.FC = () => {
                 name="remitter"
                 placeholder="Ex: Sr.Jones"
                 disabled
+                value={foundData.remitter}
               />
             </div>
           </section>
@@ -59,6 +78,7 @@ const ShowMail: React.FC = () => {
                 name="mailPidgey"
                 placeholder="Ex: Gatilho"
                 disabled
+                value={foundData.pidgey}
               />
             </div>
             <div>
@@ -69,6 +89,7 @@ const ShowMail: React.FC = () => {
                 name="status"
                 placeholder="Ex: Na fila"
                 disabled
+                value={foundData.status}
               />
             </div>
           </section>
@@ -79,6 +100,7 @@ const ShowMail: React.FC = () => {
               name="content"
               placeholder="Ex: Conteúdo da carta"
               disabled
+              value={foundData.content}
             ></textarea>
           </div>
           <button type="button">
@@ -87,10 +109,9 @@ const ShowMail: React.FC = () => {
         </form>
       </Main>
       <footer className="flex justify-center text-center items-center">
-        Criado em: &nbsp; <span>{new Date().toLocaleString()}</span> &nbsp; |
-        &nbsp; ID: <span>&nbsp;{Math.floor(Math.random() * 100000000)}</span>{' '}
-        &nbsp; | &nbsp; Atualizado em:{' '}
-        <span>&nbsp;{new Date().toLocaleString()}</span>
+        Criado em: &nbsp; <span>{foundData.createdAt}</span> &nbsp; | &nbsp; ID:{' '}
+        <span>&nbsp;{foundData.id}</span> &nbsp; | &nbsp; Atualizado em:{' '}
+        <span>&nbsp;{foundData.updatedAt}</span>
       </footer>
     </>
   );

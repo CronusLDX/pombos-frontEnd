@@ -29,8 +29,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <ListClients /> },
           { path: 'criar', element: <CreateClients /> },
-          { path: 'atualizar', element: <UpdateClients /> },
-          { path: 'verificar', element: <ShowClients /> },
+          { path: 'atualizar/:id', element: <UpdateClients /> },
+          { path: 'verificar/:id', element: <ShowClients /> },
         ],
       },
       {
@@ -39,8 +39,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <ListPidgey /> },
           { path: 'criar', element: <CreatePidgey /> },
-          { path: 'atualizar', element: <UpdatePidgey /> },
-          { path: 'verificar', element: <ShowPidgey /> },
+          { path: 'atualizar/:id', element: <UpdatePidgey /> },
+          { path: 'verificar/:id', element: <ShowPidgey /> },
         ],
       },
       {
@@ -49,8 +49,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <ListMail /> },
           { path: 'criar', element: <CreateMail /> },
-          { path: 'atualizar', element: <UpdateMail /> },
-          { path: 'verificar', element: <ShowMail /> },
+          { path: 'atualizar/:id', element: <UpdateMail /> },
+          { path: 'verificar/:id', element: <ShowMail /> },
         ],
       },
     ],

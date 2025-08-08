@@ -1,10 +1,12 @@
 import React from 'react';
 import { Main } from './styled';
+import { useClient } from '../../../contexts/ClientContext';
 
 const CreateClients: React.FC = () => {
+  const { handleSubmit } = useClient();
   return (
     <Main>
-      <form>
+      <form onSubmit={handleSubmit}>
         <section>
           <div>
             <label htmlFor="name">&nbsp;Nome:</label>
@@ -54,29 +56,10 @@ const CreateClients: React.FC = () => {
               required
             />
           </div>
-          <div>
-            <label htmlFor="observation">&nbsp;Observação:</label>
-            <input
-              type="text"
-              id="observation"
-              name="observation"
-              placeholder="Ex: Gosta de entregas rápidas"
-            />
-          </div>
-        </section>
-        <section>
+
           <div>
             <label htmlFor="letterSend">&nbsp;Cartas enviadas</label>
             <input type="number" id="letterSend" name="letterSend" required />
-          </div>
-          <div>
-            <label htmlFor="letterReceived">&nbsp;Cartas recebidas</label>
-            <input
-              type="number"
-              id="letterReceived"
-              name="letterReceived"
-              required
-            />
           </div>
         </section>
         <div>
