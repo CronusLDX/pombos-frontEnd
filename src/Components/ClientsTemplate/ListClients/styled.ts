@@ -25,6 +25,11 @@ export const Main = styled.main`
     &:hover {
       background-color: red;
     }
+    @media screen and (max-width: 768px) {
+      padding: 2px 2px 2px 2px;
+      font-size: 11.5px;
+      margin: 5px 5px 5px 5px;
+    }
   }
 `;
 
@@ -39,6 +44,11 @@ export const StyledLnkVer = styled(Link)`
   &:hover {
     background-color: #7fffd4;
   }
+  @media screen and (max-width: 768px) {
+    padding: 2px 2px 2px 2px;
+    font-size: 11.5px;
+    margin: 5px 5px 5px 5px;
+  }
 `;
 export const StyledLinkAtualizar = styled(Link)`
   text-decoration: none;
@@ -50,5 +60,10 @@ export const StyledLinkAtualizar = styled(Link)`
   color: black;
   &:hover {
     background-color: white;
+  }
+  @media screen and (max-width: 768px) {
+    padding: 2px 2px 2px 2px;
+    font-size: 11.5px;
+    margin: 5px 5px 5px 5px;
   }
 `;

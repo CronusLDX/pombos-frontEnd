@@ -1,6 +1,6 @@
 // tipagem do objeto que será enviado para api, nesse caso Clientes
 export interface ClientProps {
-  id: string;
+  id?: string;
   name: string;
   phone: string;
   dateOfBirth: string;
@@ -8,8 +8,8 @@ export interface ClientProps {
   address: string;
   letterSend: number;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // temos a definição do status segundo o exercicio pede, aqui esta a tipagem
@@ -20,7 +20,7 @@ export type statusPidgey = 'ativo' | 'aposentado';
 
 // tipagem do objeto que será enviado para api, nesse caso Cartas
 export interface MailProps {
-  id: string;
+  id?: string;
   title: string;
   address: string;
   destination: string;
@@ -28,22 +28,22 @@ export interface MailProps {
   pidgey: string;
   status: string;
   content: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // tipagem do objeto que será enviado para api, nesse caso Pombos
 export interface PidgeyProps {
-  id: string;
-  picture: string;
+  id?: string;
+  picture?: string;
   nickname: string;
   averageSpeed: number;
   status: string;
   dateOfBirth: string;
   letterDelivered: number;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // interfaxe do contexto que será usado, nesse caso Clientes
@@ -53,6 +53,7 @@ export interface ClientContextProps {
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   updateClients: (updatedClient: ClientProps) => void;
   deleteClients: (id: string) => void;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 // interfaxe do contexto que será usado, nesse caso Cartas
@@ -61,6 +62,7 @@ export interface MailContextProps {
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   updateMail: (updatedMail: MailProps) => void;
   deleteMail: (id: string) => void;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 // interfaxe do contexto que será usado, nesse caso Pombos

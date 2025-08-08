@@ -6,7 +6,9 @@ const MailLayout: React.FC = () => {
   return (
     <>
       <main className="flex flex-col px-5  ">
-        <h1 className="px-4">Dados das Cartas</h1>
+        <h1 className="px-4 text-2xl md:text-3xl lg:text-5xl py-2">
+          Dados das Cartas
+        </h1>
         <div className="tabs ">
           <Link
             to="/cartas"

@@ -48,16 +48,16 @@ h6 {
   font-weight: 300;
 }
 
-h1 {
-  font-size: 3rem;
-}
-
 nav a,
 .logo {
   display: inline-block;
   color: #fefefe;
   padding: 1rem;
   text-decoration: none;
+
+  @media screen and (max-width: 768px) {
+    padding: 0.35rem;
+  }
 }
 
 nav a:hover {
@@ -104,8 +104,12 @@ tbody tr:hover {
 
 th,
 td {
-  /* border: 1px solid #fefefe; */
-  padding: 1.25rem;
+  padding: 1rem;
+
+  @media screen and (max-width: 768px) {
+    padding: 0.37rem;
+    font-size: 10.5px;
+  }
 }
 
 .button {
@@ -163,6 +167,11 @@ select {
   margin-bottom: 1rem;
   padding: 0.75rem;
   width: 100%;
+
+  @media screen and (max-width: 768px) {
+    padding: 0.4rem;
+    width: 94%;
+  }
 }
 
 .row {
@@ -201,4 +210,16 @@ select {
   font-size: 3rem;
   margin: 1rem 0;
   text-align: center;
+}
+
+footer {
+  justify-content: center;
+  text-align: center;
+  display: flex;
+  align-items: center;
+
+  @media screen and (max-width: 768px) {
+    font-size: 8px;
+    display: block;
+  }
 }

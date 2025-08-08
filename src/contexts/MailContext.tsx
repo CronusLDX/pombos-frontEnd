@@ -9,6 +9,8 @@ import type {
 import { v4 as uuidv4 } from 'uuid';
 import { usePidgey } from './PidgeyContext';
 import { useClient } from './ClientContext';
+import { deleteMailById, getAllMails, postMail, putMail } from '../api/api';
+import React from 'react';
 
 export const MailContext: React.Context<MailContextProps | null> =
   createContext<MailContextProps | null>(null);
@@ -18,12 +20,22 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [mail, setMail] = useState<MailProps[]>([]);
   const showAlert = (message: string): void => alert(message);
-  const { pidgey, formRef, updatePidgey } = usePidgey();
+  const { pidgey, updatePidgey } = usePidgey();
   const { client, updateClients } = useClient();
 
+  const formRef = React.useRef<HTMLFormElement | null>(null);
+  const fetchAllMail = async () => {
+    try {
+      const response = await getAllMails();
+
+      setMail(response.data);
+    } catch (error) {
+      console.error('Error fetching mail:', error);
+    }
+  };
   useEffect(() => {
-    console.log(mail);
-  }, [mail]);
+    fetchAllMail();
+  }, []);
 
   const validateCharsOnly = (item: string): boolean => {
     const regex: RegExp = /^[A-Za-zÀ-ÖØ-öø-ÿ\s,\.]+$/;
@@ -44,15 +56,19 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     return false;
   };
-  const allPidgeysNicknamesAndStatus = pidgey.map(pidgey => ({
-    nickname: pidgey.nickname,
-    status: pidgey.status,
-  }));
-
-  const allClientsName = client.map(client => client.name);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
+      const allPidgeysNicknamesAndStatus = Array.isArray(pidgey)
+        ? pidgey.map(p => ({
+            nickname: p.nickname,
+            status: p.status,
+          }))
+        : [];
+
+      const allClientsName = Array.isArray(client)
+        ? client.map((client: ClientProps) => client.name.toLowerCase())
+        : [];
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       const mailPidgeyName = (
@@ -87,25 +103,29 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
         client => client.toLowerCase() === clientName
       );
       if (!validatedTitle) {
-        showAlert('Assunto inválido!');
+        showAlert('Título inválido!');
       } else if (!validatedStatus) {
         showAlert('Status inválido!');
       } else if (!validatedAddress) {
         showAlert('Endereço inválido!');
       } else if (!validatedDestination) {
-        showAlert('Destinatário inválido!');
+        showAlert('Destino inválido!');
       } else if (!validatedRemitter) {
         showAlert('Remetente inválido!');
       } else if (!validatedPidgey) {
-        showAlert('Nome de pombo  inválido!');
+        showAlert('Pombo inválido!');
       } else if (!pidgeyExistsAndIsActive) {
-        showAlert(
-          'Pombo inexistente no sistema ou aposentado, por favor cadastre-o ou escolha outro pombo!'
-        );
+        {
+          showAlert(
+            'Pombo inexistente no sistema ou aposentado, por favor cadastre-o ou escolha outro pombo!'
+          );
+        }
       } else if (!clientExists) {
-        showAlert(
-          'Remetente inexistente no sistema, por favor cadastre-o ou escolha outro remetente!'
-        );
+        {
+          showAlert(
+            'Remetente inexistente no sistema, por favor cadastre-o ou escolha outro remetente!'
+          );
+        }
       } else {
         const newMail: MailProps = {
           id: uuidv4(),
@@ -119,10 +139,8 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
             validatedDestination === true
               ? (formData.get('destination') as string)
               : '',
-          remitter:
-            validatedRemitter === true
-              ? (formData.get('remitter') as string)
-              : '',
+          remitter: formData.get('remitter') as string,
+
           pidgey:
             validatedPidgey === true && pidgeyExistsAndIsActive === true
               ? (formData.get('mailPidgey') as string)
@@ -133,7 +151,8 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        setMail(prevMail => [...prevMail, newMail]);
+        const response = await postMail(newMail);
+        setMail(prevMail => [...prevMail, response.data]);
 
         try {
           const foundClient = client.find(
@@ -165,16 +184,15 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
           );
         }
         showAlert('Carta cadastrada com sucesso!');
+        formRef.current?.reset();
       }
     } catch (error) {
       console.log(error);
       showAlert('Erro ao cadastrar a carta!');
-    } finally {
-      formRef.current?.reset();
     }
   };
 
-  const updateMail = (updatedMail: MailProps): void => {
+  const updateMail = async (updatedMail: MailProps): Promise<void> => {
     try {
       const validatedTitle = validateCharsOnly(updatedMail.title);
       const validatedAddress = validateAddress(updatedMail.address);
@@ -182,9 +200,9 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
       const validatedRemitter = validateCharsOnly(updatedMail.remitter);
       const validatedPidgey = validateCharsOnly(updatedMail.pidgey);
       const validatedStatus = validateStatusMail(updatedMail.status);
-      const mailIsDelivered = mail.some(
-        mail => mail.status.toLowerCase() === 'entregue'
-      );
+      const currentMailStatus = mail.find(mail => mail.id === updatedMail.id);
+      const mailIsDelivered =
+        currentMailStatus?.status.toLowerCase() === 'entregue';
       const pidgeyExistsAndIsActive = pidgey.some(
         pidgey =>
           pidgey.nickname.toLowerCase() === updatedMail.pidgey.toLowerCase() &&
@@ -195,13 +213,15 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
           client.name.toLowerCase() === updatedMail.remitter.toLowerCase()
       );
       if (!validatedTitle) {
-        showAlert('Assunto inválido!');
+        showAlert('Título inválido!');
       } else if (!validatedStatus) {
         showAlert('Status inválido!');
       } else if (!validatedAddress) {
         showAlert('Endereço inválido!');
       } else if (mailIsDelivered) {
-        showAlert('Carta entregue, impossível editar o seu status!');
+        {
+          showAlert('Carta entregue, impossível editar o seu status!');
+        }
       } else if (!validatedDestination) {
         showAlert('Destinatário inválido!');
       } else if (!validatedRemitter) {
@@ -209,34 +229,42 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
       } else if (!validatedPidgey) {
         showAlert('Nome de pombo  inválido!');
       } else if (!pidgeyExistsAndIsActive) {
-        showAlert(
-          'Pombo inexistente no sistema ou aposentado, por favor cadastre-o ou escolha outro pombo!'
-        );
+        {
+          showAlert(
+            'Pombo inexistente no sistema ou aposentado, por favor cadastre-o ou escolha outro pombo!'
+          );
+        }
       } else if (!clientExists) {
-        showAlert(
-          'Remetente inexistente no sistema, por favor cadastre-o ou escolha outro remetente!'
-        );
+        {
+          showAlert(
+            'Remetente inexistente no sistema, por favor cadastre-o ou escolha outro remetente!'
+          );
+        }
       } else {
+        const response = await putMail(updatedMail.id, updatedMail);
+        const data = response.data;
         const updatedMails: MailProps[] = mail.map(mail => {
           if (mail.id === updatedMail.id) {
             return {
-              ...updatedMail,
+              ...data,
             };
           } else {
             return mail;
           }
         });
         setMail(updatedMails);
+
         showAlert('Carta atualizada com sucesso!');
       }
     } catch (error) {
       console.log(error);
-      showAlert('Erro ao atualizar a carta!');
+      showAlert('Erro ao atualizar a carta.');
     }
   };
 
-  const deleteMail = (id: string): void => {
+  const deleteMail = async (id: string): Promise<void> => {
     try {
+      await deleteMailById(id);
       setMail(prevMail => prevMail.filter(mail => mail.id !== id));
       showAlert('Carta deletada com sucesso!');
     } catch (error) {
@@ -246,7 +274,7 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   return (
     <MailContext.Provider
-      value={{ mail, handleSubmit, updateMail, deleteMail }}
+      value={{ mail, handleSubmit, updateMail, deleteMail, formRef }}
     >
       {children}
     </MailContext.Provider>

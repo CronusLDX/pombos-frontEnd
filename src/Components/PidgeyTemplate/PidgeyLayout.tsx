@@ -5,8 +5,10 @@ const PidgeyLayout: React.FC = () => {
   const { pathname } = useLocation();
   return (
     <>
-      <main className="flex flex-col px-5  ">
-        <h1 className="px-4">Dados dos Pombos-Correio</h1>
+      <main className="flex flex-col px-5 ">
+        <h1 className="px-4 text-2xl md:text-3xl lg:text-5xl py-2">
+          Dados dos Pombos-Correio
+        </h1>
         <div className="tabs ">
           <Link
             to="/pombos"

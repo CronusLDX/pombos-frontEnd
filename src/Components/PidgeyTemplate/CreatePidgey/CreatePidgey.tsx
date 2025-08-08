@@ -3,11 +3,11 @@ import { Main } from './styled';
 import { usePidgey } from '../../../contexts/PidgeyContext';
 
 const CreatePidgey: React.FC = () => {
-  const { handleSubmit } = usePidgey();
+  const { handleSubmit, formRef } = usePidgey();
   return (
     <>
       <Main>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
           <section>
             <div>
               <label htmlFor="picture">&nbsp;Foto:</label>
@@ -16,7 +16,6 @@ const CreatePidgey: React.FC = () => {
                 id="picture"
                 name="picture"
                 placeholder="URL da imagem"
-                required
               />
             </div>
             <div>
@@ -32,7 +31,7 @@ const CreatePidgey: React.FC = () => {
           </section>
           <section>
             <div>
-              <label htmlFor="averageSpeed">&nbsp;Velocidade Média km/h</label>
+              <label htmlFor="averageSpeed">&nbsp;Velocidade Média </label>
               <input
                 type="number"
                 id="averageSpeed"

@@ -1,7 +1,14 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ClientContextProps, ClientProps } from '../utilities/Interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { usePidgey } from './PidgeyContext';
+
+import {
+  deleteClientbyId,
+  getAllClientes,
+  postClient,
+  putClient,
+} from '../api/api';
+import React from 'react';
 
 export const ClientContext: React.Context<ClientContextProps | null> =
   createContext<ClientContextProps | null>(null);
@@ -11,11 +18,20 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [client, setClient] = useState<ClientProps[]>([]);
   const showAlert = (message: string): void => alert(message);
-  const { formRef } = usePidgey();
+  const formRef = React.useRef<HTMLFormElement | null>(null);
 
+  const fetchAllClients = async () => {
+    try {
+      const response = await getAllClientes();
+
+      setClient(response.data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
   useEffect(() => {
-    console.log(client);
-  }, [client]);
+    fetchAllClients();
+  }, []);
 
   const validatePhone = (phone: string): boolean => {
     const regex: RegExp = /^\(?\d{2}\)?\s?9\d{4}-?\d{4}$/;
@@ -65,22 +81,25 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        setClient(prevClient => [...prevClient, newClient]);
-        showAlert('Cliente criado com sucesso!');
+
+        const response = await postClient(newClient);
+        setClient(prevClient => [...prevClient, response.data]);
+        showAlert('Cliente cadastrado com sucesso!');
+        formRef.current?.reset();
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      formRef.current?.reset();
+      showAlert('Erro ao cadastrar o cliente.');
     }
   };
 
-  const updateClients = (updatedClient: ClientProps): void => {
+  const updateClients = async (updatedClient: ClientProps): Promise<void> => {
+    if (!updatedClient.id) throw new Error('ID do cliente ausente!');
+
     try {
       const updatedClientName = validateCharsOnly(updatedClient.name);
       const updatedClientPhone = validatePhone(updatedClient.phone);
       const updatedClientAddress = validateAddress(updatedClient.address);
-
       if (!updatedClientName) {
         showAlert('Nome inválido!');
       } else if (!updatedClientPhone) {
@@ -88,10 +107,12 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
       } else if (!updatedClientAddress) {
         showAlert('Endereço inválido!');
       } else {
+        const response = await putClient(updatedClient.id, updatedClient);
+        const data = response.data;
         const updatedClients = client.map(client => {
           if (client.id === updatedClient.id) {
             return {
-              ...updatedClient,
+              ...data,
             };
           } else {
             return client;
@@ -106,8 +127,9 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const deleteClients = (id: string) => {
+  const deleteClients = async (id: string) => {
     try {
+      await deleteClientbyId(id);
       setClient(prevClient => prevClient.filter(client => client.id !== id));
       showAlert('Cliente deletado com sucesso!');
     } catch (error) {
@@ -117,7 +139,7 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   return (
     <ClientContext.Provider
-      value={{ client, handleSubmit, updateClients, deleteClients }}
+      value={{ client, handleSubmit, updateClients, deleteClients, formRef }}
     >
       {children}
     </ClientContext.Provider>

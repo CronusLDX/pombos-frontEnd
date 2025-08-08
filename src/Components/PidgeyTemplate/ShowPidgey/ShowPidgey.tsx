@@ -107,7 +107,7 @@ const ShowPidgey: React.FC = () => {
           </button>
         </form>
       </Main>
-      <footer className="flex justify-center text-center items-center">
+      <footer>
         Criado em: &nbsp; <span>{foundData.createdAt}</span> &nbsp; | &nbsp; ID:{' '}
         <span>&nbsp;{foundData.id}</span> &nbsp; | &nbsp; Atualizado em:{' '}
         <span>&nbsp;{foundData.updatedAt}</span>

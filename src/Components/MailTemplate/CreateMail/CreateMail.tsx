@@ -3,11 +3,11 @@ import { Main } from './styled';
 import { useMail } from '../../../contexts/MailContext';
 
 const CreateMail: React.FC = () => {
-  const { handleSubmit } = useMail();
+  const { handleSubmit, formRef } = useMail();
   return (
     <>
       <Main>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
           <section>
             <div>
               <label htmlFor="title">&nbsp;Título:</label>

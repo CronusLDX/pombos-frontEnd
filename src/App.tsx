@@ -5,6 +5,7 @@ import { PidgeyProvider } from './contexts/PidgeyContext';
 import { MailProvider } from './contexts/MailContext';
 
 const App = () => {
+  console.log('App renderizou');
   return (
     <>
       <PidgeyProvider>

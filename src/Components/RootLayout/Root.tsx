@@ -11,25 +11,32 @@ const Root: React.FC = () => {
             <img
               src={logo}
               alt="Logo"
-              className="h-16 justify-center flex w-14"
+              className="lg:h-16 md:hidden hidden justify-center lg:flex w-14"
             />
-            <span className="text-5xl font-light">Pombos Delivery</span>
+            <span className="lg:text-5xl md:text-md text-sm font-light">
+              Pombos Delivery
+            </span>
           </div>
         </Link>
         <nav>
-          <Link to="/">Home</Link>
-          <Link to="/pombos">Pombos</Link>
-          <Link to="/cartas">Cartas</Link>
-          <Link to="/clientes">Clientes</Link>
+          <Link to="/" className="md:text-md text-[12px] lg:text-lg">
+            Home
+          </Link>
+          <Link to="/pombos" className="md:text-md text-[12px] lg:text-lg">
+            Pombos
+          </Link>
+          <Link to="/cartas" className="md:text-md text-[12px] lg:text-lg">
+            Cartas
+          </Link>
+          <Link to="/clientes" className="md:text-md text-[12px] lg:text-lg">
+            Clientes
+          </Link>
         </nav>
       </header>
       <section>
         <Outlet />
       </section>
-
-      <footer>
-        Todos Direitos Reservados &copy; {new Date().getFullYear()}
-      </footer>
+      <footer></footer>
     </>
   );
 };

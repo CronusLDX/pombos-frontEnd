@@ -6,6 +6,12 @@ import type {
   statusPidgey,
 } from '../utilities/Interfaces';
 import React from 'react';
+import {
+  deletePidgeyById,
+  getAllPidgeys,
+  postPidgey,
+  putPidgey,
+} from '../api/api';
 
 export const PidgeyContext: React.Context<PidgeyContextProps | null> =
   createContext<PidgeyContextProps | null>(null);
@@ -18,9 +24,19 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const formRef = React.useRef<HTMLFormElement | null>(null);
 
+  const fetchAllPidgey = async () => {
+    try {
+      const response = await getAllPidgeys();
+
+      const data = response.data;
+      setPidgey(data);
+    } catch (error) {
+      console.error('Error fetching pidgey:', error);
+    }
+  };
   useEffect(() => {
-    console.log(pidgey);
-  }, [pidgey]);
+    fetchAllPidgey();
+  }, []);
 
   const validateNickName = (name: string): boolean => {
     const regex: RegExp = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
@@ -43,6 +59,12 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
+      const rawPidgeyNickname = (
+        formData.get('nickname') as string
+      ).toLowerCase();
+      const nicknameAlreadyRegistered = pidgey.some(
+        pidgey => pidgey.nickname.toLowerCase() === rawPidgeyNickname
+      );
 
       const rawAverageSpeed = parseFloat(
         formData.get('averageSpeed') as string
@@ -57,6 +79,8 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!validatedNickName) {
         showALert('Nome inválido!');
+      } else if (nicknameAlreadyRegistered) {
+        showALert('Nome de pombos já cadastrado!');
       } else if (!validatedStatus) {
         showALert('Status inválido!');
       } else {
@@ -78,18 +102,21 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        setPidgey(prevPidgey => [...prevPidgey, newPidgey]);
+        const response = await postPidgey(newPidgey);
+        setPidgey(prevPidgey => [...prevPidgey, response.data]);
+
         showALert('Pombos criado com sucesso!');
+
+        formRef.current?.reset();
       }
     } catch (error) {
       console.log(error);
+
       showALert('Erro ao criar o pombos!');
-    } finally {
-      formRef.current?.reset();
     }
   };
 
-  const updatePidgey = (updatedPidgey: PidgeyProps) => {
+  const updatePidgey = async (updatedPidgey: PidgeyProps) => {
     try {
       const validatedUpdatedNickName = validateNickName(updatedPidgey.nickname);
       const validatedUpdatedStatus = validateStatus(updatedPidgey.status);
@@ -98,29 +125,36 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
       } else if (!validatedUpdatedStatus) {
         showALert('Status inválido!');
       } else {
+        const response = await putPidgey(updatedPidgey.id, updatedPidgey);
         const updatePidgey = pidgey.map(pidgey => {
           if (pidgey.id === updatedPidgey.id) {
             return {
-              ...updatedPidgey,
+              ...response.data,
+              status: response.data.status.toLowerCase(),
             };
           } else {
             return pidgey;
           }
         });
         setPidgey(updatePidgey);
+
         showALert('Pombos atualizado com sucesso!');
       }
     } catch (error) {
       console.log(error);
+
       showALert('Erro ao atualizar o pombos!');
     }
   };
-  const deletePidgey = (id: string) => {
+  const deletePidgey = async (id: string) => {
     try {
+      await deletePidgeyById(id);
       setPidgey(prevPidgey => prevPidgey.filter(pidgey => pidgey.id !== id));
+
       showALert('Pombos deletado com sucesso!');
     } catch (error) {
       console.log(error);
+
       showALert('Erro ao deletar o pombos.');
     }
   };
