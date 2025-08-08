@@ -6,11 +6,12 @@ import type {
   PidgeyProps,
   statusMail,
 } from '../utilities/Interfaces';
-import { v4 as uuidv4 } from 'uuid';
+
 import { usePidgey } from './PidgeyContext';
 import { useClient } from './ClientContext';
 import { deleteMailById, getAllMails, postMail, putMail } from '../api/api';
 import React from 'react';
+import { convertId } from '../utilities/utilitary';
 
 export const MailContext: React.Context<MailContextProps | null> =
   createContext<MailContextProps | null>(null);
@@ -27,8 +28,8 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchAllMail = async () => {
     try {
       const response = await getAllMails();
-
-      setMail(response.data);
+      const mailWithNewId = convertId(response.data);
+      setMail(mailWithNewId);
     } catch (error) {
       console.error('Error fetching mail:', error);
     }
@@ -128,7 +129,6 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } else {
         const newMail: MailProps = {
-          id: uuidv4(),
           title:
             validatedTitle === true ? (formData.get('title') as string) : '',
           address:
@@ -148,11 +148,10 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
           status:
             validatedStatus === true ? (formData.get('status') as string) : '',
           content: formData.get('content') as string,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         };
         const response = await postMail(newMail);
-        setMail(prevMail => [...prevMail, response.data]);
+        const mailWithNewId = convertId(response.data);
+        setMail(prevMail => [...prevMail, mailWithNewId]);
 
         try {
           const foundClient = client.find(
@@ -241,12 +240,14 @@ export const MailProvider: React.FC<{ children: React.ReactNode }> = ({
           );
         }
       } else {
+        if (!updatedMail.id) throw new Error('ID do cliente ausente!');
         const response = await putMail(updatedMail.id, updatedMail);
-        const data = response.data;
+        const mailwithNewId = convertId(response.data);
         const updatedMails: MailProps[] = mail.map(mail => {
           if (mail.id === updatedMail.id) {
             return {
-              ...data,
+              ...mail,
+              ...mailwithNewId,
             };
           } else {
             return mail;

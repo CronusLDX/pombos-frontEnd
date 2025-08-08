@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import type {
   PidgeyProps,
   PidgeyContextProps,
@@ -12,6 +11,7 @@ import {
   postPidgey,
   putPidgey,
 } from '../api/api';
+import { convertId } from '../utilities/utilitary';
 
 export const PidgeyContext: React.Context<PidgeyContextProps | null> =
   createContext<PidgeyContextProps | null>(null);
@@ -27,9 +27,8 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchAllPidgey = async () => {
     try {
       const response = await getAllPidgeys();
-
-      const data = response.data;
-      setPidgey(data);
+      const pidgeyWithNewId = convertId(response.data);
+      setPidgey(pidgeyWithNewId);
     } catch (error) {
       console.error('Error fetching pidgey:', error);
     }
@@ -85,7 +84,6 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
         showALert('Status inválido!');
       } else {
         const newPidgey: PidgeyProps = {
-          id: uuidv4(),
           picture: formData.get('picture') as string,
           nickname:
             validatedNickName === true
@@ -99,11 +97,10 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
           dateOfBirth: formData.get('dateOfBirth') as string,
           letterDelivered: rawLetterDelivered,
           description: formData.get('description') as string,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         };
         const response = await postPidgey(newPidgey);
-        setPidgey(prevPidgey => [...prevPidgey, response.data]);
+        const pidgeyWithNewId = convertId([response.data]);
+        setPidgey(prevPidgey => [...prevPidgey, pidgeyWithNewId]);
 
         showALert('Pombos criado com sucesso!');
 
@@ -125,12 +122,15 @@ export const PidgeyProvider: React.FC<{ children: React.ReactNode }> = ({
       } else if (!validatedUpdatedStatus) {
         showALert('Status inválido!');
       } else {
+        if (!updatedPidgey.id) throw new Error('ID do cliente ausente!');
         const response = await putPidgey(updatedPidgey.id, updatedPidgey);
+        const newPidgeyWithNewId = convertId(response.data);
         const updatePidgey = pidgey.map(pidgey => {
           if (pidgey.id === updatedPidgey.id) {
             return {
-              ...response.data,
-              status: response.data.status.toLowerCase(),
+              ...pidgey,
+              ...newPidgeyWithNewId,
+              status: newPidgeyWithNewId.status.toLowerCase(),
             };
           } else {
             return pidgey;

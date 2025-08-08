@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ClientContextProps, ClientProps } from '../utilities/Interfaces';
-import { v4 as uuidv4 } from 'uuid';
 
 import {
   deleteClientbyId,
@@ -9,6 +8,7 @@ import {
   putClient,
 } from '../api/api';
 import React from 'react';
+import { convertId } from '../utilities/utilitary';
 
 export const ClientContext: React.Context<ClientContextProps | null> =
   createContext<ClientContextProps | null>(null);
@@ -23,8 +23,8 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchAllClients = async () => {
     try {
       const response = await getAllClientes();
-
-      setClient(response.data);
+      const clientWithNewId = convertId(response.data);
+      setClient(clientWithNewId);
     } catch (error) {
       console.error('Error fetching clients:', error);
     }
@@ -67,7 +67,6 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
         showAlert('Endereço inválido!');
       } else {
         const newClient: ClientProps = {
-          id: uuidv4(),
           name: validatedName === true ? (formData.get('name') as string) : '',
           phone:
             validatePhone(formData.get('phone') as string) === true
@@ -78,12 +77,11 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
           address: formData.get('address') as string,
           letterSend: rawLetterSend,
           description: formData.get('description') as string,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         };
 
         const response = await postClient(newClient);
-        setClient(prevClient => [...prevClient, response.data]);
+        const newClientWithNewId = convertId(response.data);
+        setClient(prevClient => [...prevClient, newClientWithNewId]);
         showAlert('Cliente cadastrado com sucesso!');
         formRef.current?.reset();
       }
@@ -108,11 +106,13 @@ export const ClientProvider: React.FC<{ children: React.ReactNode }> = ({
         showAlert('Endereço inválido!');
       } else {
         const response = await putClient(updatedClient.id, updatedClient);
-        const data = response.data;
+        const newClientWithNewId = convertId(response.data);
+
         const updatedClients = client.map(client => {
           if (client.id === updatedClient.id) {
             return {
-              ...data,
+              ...client,
+              newClientWithNewId,
             };
           } else {
             return client;
